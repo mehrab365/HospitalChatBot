@@ -2,6 +2,7 @@ package com.example.hospitalconcierge.controller;
 
 import com.example.hospitalconcierge.service.HospitalDataService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +15,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
+@Slf4j
 public class ChatController {
 
     private final ChatClient.Builder chatClientBuilder;
@@ -25,6 +27,7 @@ public class ChatController {
     @PostMapping("/chat")
     public Map<String, String> chat(@RequestBody Map<String, String> payload) {
         String userQuestion = payload.get("message");
+        log.info("Received chat request: {}", userQuestion);
         String hospitalData = hospitalDataService.getHospitalDataAsText();
 
         ChatClient chatClient = chatClientBuilder.build();
@@ -47,9 +50,10 @@ public class ChatController {
                     .user(userQuestion)
                     .call()
                     .content();
+            log.info("AI Response generated successfully");
             return Map.of("response", response);
         } catch (Exception e) {
-            e.printStackTrace(); // Print to console for us
+            log.error("Error processing chat request", e);
             return Map.of("response", "Error: " + e.getMessage());
         }
     }
