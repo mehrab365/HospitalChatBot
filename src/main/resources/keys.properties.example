@@ -1,0 +1,2 @@
+# Copy this file to keys.properties and add your actual API key
+spring.ai.openai.api-key=INSERT_YOUR_KEY_HERE

@@ -21,12 +21,13 @@ export SPRING_AI_OPENAI_API_KEY=your_api_key_here
 ./gradlew bootRun
 ```
 
-### Option B: Hardcode (For testing only)
-Open `src/main/resources/application.properties` and paste your key:
-```properties
-spring.ai.openai.api-key=your_actual_api_key_starts_with_AIza...
-```
-*(Be careful not to commit this file to GitHub if you do this).*
+### Option B: Properties File (Template Pattern)
+1.  Copy `src/main/resources/keys.properties.example` to `src/main/resources/keys.properties`.
+2.  Open `keys.properties` and paste your key:
+    ```properties
+    spring.ai.openai.api-key=your_actual_api_key_starts_with_AIza...
+    ```
+    *(Note: keys.properties is git-ignored to keep your secret safe).*
 
 ## 3. Run the App
 
