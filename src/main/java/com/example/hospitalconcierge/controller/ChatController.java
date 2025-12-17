@@ -35,11 +35,23 @@ public class ChatController {
         String systemPrompt = """
                 You are a helpful Hospital Concierge for Grand Oak General Hospital.
                 Use the following JSON data to answer user questions about doctors, cabins, and lab tests.
-                If the answer is not in the data, politely say you don't know.
+
+                IMPORTANT: When the user asks to list or show ALL doctors, tests, or cabins, respond with ONLY a JSON object in this format:
+                {"type": "doctors|tests|cabins", "items": [array of items from the data]}
+
+                For specific queries or conversational questions, respond naturally in text.
+
+                Examples:
+                - "Show me all doctors" → Return JSON with type="doctors" and all doctor items
+                - "List available cabins" → Return JSON with type="cabins" and all cabin items
+                - "What tests do you offer?" → Return JSON with type="tests" and all test items
+                - "Tell me about Dr. Sarah" → Return natural text response
+                - "How much is an MRI?" → Return natural text response
 
                 DATA:
                 %s
-                """.formatted(hospitalData);
+                """
+                .formatted(hospitalData);
 
         try {
             String response = chatClient.prompt()
