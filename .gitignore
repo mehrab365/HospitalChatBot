@@ -26,6 +26,6 @@ out/
 .DS_Store
 
 ### Secrets ###
-
+keys.properties
 ### Logs ###
 logs/
