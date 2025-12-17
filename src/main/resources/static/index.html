@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital Concierge</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 h-screen flex items-center justify-center">
+
+    <div class="w-full max-w-2xl bg-white rounded-lg shadow-xl overflow-hidden flex flex-col h-[80vh]">
+        <!-- Header -->
+        <div class="bg-blue-600 p-4 text-white">
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                🏥 Hospital Concierge
+            </h1>
+            <p class="text-blue-100 text-sm">Ask about doctors, cabins, or lab tests</p>
+        </div>
+
+        <!-- Chat Area -->
+        <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-4 bg-gray-50">
+            <!-- Welcome Message -->
+            <div class="flex justify-start">
+                <div class="bg-blue-100 text-blue-900 rounded-lg rounded-tl-none p-3 max-w-[80%]">
+                    Hello! I'm your hospital concierge. How can I help you today?
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="p-4 border-t bg-white">
+            <form id="chat-form" class="flex gap-2">
+                <input type="text" id="user-input" 
+                    class="flex-1 border rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Type your question..." autocomplete="off">
+                <button type="submit" 
+                    class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition-colors font-medium disabled:opacity-50">
+                    Send
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const chatForm = document.getElementById('chat-form');
+        const userInput = document.getElementById('user-input');
+        const chatMessages = document.getElementById('chat-messages');
+
+        function appendMessage(text, isUser) {
+            const div = document.createElement('div');
+            div.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+            
+            const bubble = document.createElement('div');
+            bubble.className = isUser 
+                ? 'bg-blue-600 text-white rounded-lg rounded-tr-none p-3 max-w-[80%]' 
+                : 'bg-white border text-gray-800 rounded-lg rounded-tl-none p-3 max-w-[80%] shadow-sm';
+            bubble.textContent = text;
+            
+            div.appendChild(bubble);
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function showTyping() {
+            const div = document.createElement('div');
+            div.id = 'typing-indicator';
+            div.className = 'flex justify-start';
+            div.innerHTML = `
+                <div class="bg-gray-200 text-gray-500 rounded-lg rounded-tl-none p-3 text-sm animate-pulse">
+                    Typing...
+                </div>
+            `;
+            chatMessages.appendChild(div);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        function removeTyping() {
+            const el = document.getElementById('typing-indicator');
+            if (el) el.remove();
+        }
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            // UI Updates
+            appendMessage(message, true);
+            userInput.value = '';
+            showTyping();
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+
+                const data = await response.json();
+                removeTyping();
+                
+                if (data.response) {
+                    appendMessage(data.response, false);
+                } else {
+                    appendMessage('Sorry, I encountered an error.', false);
+                }
+            } catch (error) {
+                removeTyping();
+                console.error('Error:', error);
+                appendMessage('Network error. Please try again.', false);
+            }
+        });
+    </script>
+</body>
+</html>
