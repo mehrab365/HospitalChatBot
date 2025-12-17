@@ -53,20 +53,15 @@ public class ChatController {
                 """
                 .formatted(hospitalData);
 
-        try {
-            String response = chatClient.prompt()
-                    .options(org.springframework.ai.openai.OpenAiChatOptions.builder()
-                            .withModel(modelName)
-                            .build())
-                    .system(systemPrompt)
-                    .user(userQuestion)
-                    .call()
-                    .content();
-            log.info("AI Response generated successfully");
-            return Map.of("response", response);
-        } catch (Exception e) {
-            log.error("Error processing chat request", e);
-            return Map.of("response", "Error: " + e.getMessage());
-        }
+        String response = chatClient.prompt()
+                .options(org.springframework.ai.openai.OpenAiChatOptions.builder()
+                        .withModel(modelName)
+                        .build())
+                .system(systemPrompt)
+                .user(userQuestion)
+                .call()
+                .content();
+        log.info("AI Response generated successfully");
+        return Map.of("response", response);
     }
 }
